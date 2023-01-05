@@ -1,6 +1,7 @@
 package fr.ninedocteur.ninetylib;
 
 import com.mojang.logging.LogUtils;
+import fr.ninedocteur.ninetylib.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -36,19 +37,9 @@ public class NinetyLib {
     public NinetyLib() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        modEventBus.addListener(this::commonSetup);
 
 
         MinecraftForge.EVENT_BUS.register(this);
-    }
-
-    private void commonSetup(final FMLCommonSetupEvent event) {
-
-    }
-
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
-
     }
 
 }

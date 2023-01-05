@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import com.mojang.blaze3d.platform.NativeImage;
+import net.minecraft.world.entity.player.Player;
 import org.stringtemplate.v4.ST;
 
 import java.io.BufferedReader;
@@ -25,6 +26,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class Utils {
     public class Game {
@@ -250,6 +252,44 @@ public class Utils {
                         Minecraft.getInstance()
                                 .setScreen(screen);
                     });
+        }
+    }
+
+    public class Player {
+        public static boolean isSneaking(net.minecraft.world.entity.player.Player player){
+            return player.isCrouching();
+        }
+
+        public static boolean isInCreativeMode(net.minecraft.world.entity.player.Player player){
+            return player.isCreative();
+        }
+
+        public static boolean isInSurvivalMode(net.minecraft.world.entity.player.Player player){
+            return !player.isCreative();
+        }
+
+        public static ResourceLocation getPlayerHead(final String name){
+            return Utils.Web.readTexture("https://minotar.net/helm/" + name + "/16.png", name + "_player_helm", NinetyLib.MODID);
+        }
+
+        public static ResourceLocation get3DPlayerHead(final String uuid){
+            return Utils.Web.readTexture("https://crafatar.com/renders/head/" + uuid + "?scale=10&size=512&overlay", uuid + "_player_head", NinetyLib.MODID);
+        }
+
+        public static ResourceLocation get3DSkin(final String uuid){
+            return Utils.Web.readTexture("https://crafatar.com/renders/body/" + uuid, uuid + "_player_body", NinetyLib.MODID);
+        }
+
+        public static ResourceLocation getSkin(final String UUID){
+            return Utils.Web.readTexture("https://crafatar.com/skins/", UUID, NinetyLib.MODID);
+        }
+
+        public static String getUserUUID(String playerName) {
+            return Utils.Web.readWebContent("https://minecraft-api.com/api/uuid/" + playerName);
+        }
+
+        public static String getUserNameByUUID(UUID playerUUID) {
+            return Utils.Web.readWebContent("https://minecraft-api.com/api/pseudo/" + playerUUID);
         }
     }
 }

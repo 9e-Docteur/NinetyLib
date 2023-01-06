@@ -39,8 +39,6 @@ public class NinetyLib {
 
     public NinetyLib() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-
-
         MinecraftForge.EVENT_BUS.register(this);
     }
 

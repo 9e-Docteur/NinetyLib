@@ -3,7 +3,7 @@ A lib created by 9e_Docteur, for his mod and other dev, it contains a Discord Ri
 
 [![Github License](https://img.shields.io/badge/liscence-All%20Right%20Reserved-red)]()
 [![Github Release](https://img.shields.io/github/v/release/9e-Docteur/NinetyLib)]()
-[![Github Repo Size](https://img.shields.io/github/repo-size/9e-docteur/NinetyLib-New)]()
+[![Github Repo Size](https://img.shields.io/github/repo-size/9e-docteur/NinetyLib)]()
 [![Github Repo Issues](https://img.shields.io/github/issues/9e-docteur/NinetyLib)]()
 [![Github Repo Stars](https://img.shields.io/github/stars/9e-Docteur/NinetyLib)]()
 <a href="https://discord.gg/7VA9X67xRB"><img src="https://img.shields.io/discord/910285401770573835?color=5865f2&label=Discord&style=flat" alt="Discord"></a>

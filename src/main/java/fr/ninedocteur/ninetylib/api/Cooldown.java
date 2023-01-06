@@ -8,34 +8,34 @@ import net.minecraft.world.item.Item;
  * Custom, beter cooldown system wich work with seconds for easy use.
  */
 public class Cooldown {
-    public static int cooldown;
+    public int cooldown;
 
-    public static void addCooldown(Player player, Item item, int seconds){
+    public void addCooldown(Player player, Item item, int seconds){
         player.getCooldowns().addCooldown(item, MathUtils.convertSecondsToTick(seconds));
-        Cooldown.setCooldown(seconds);
+        this.setCooldown(seconds);
     }
 
 
-    public static int getCooldown() {
+    public int getCooldown() {
         return cooldown;
     }
 
-    public static void setCooldown(int cooldown) {
-        Cooldown.cooldown = cooldown;
+    public void setCooldown(int cooldown) {
+        this.cooldown = cooldown;
     }
 
-    public static void substractCooldown(int toSubstract){
+    public void substractCooldown(int toSubstract){
         int i = getCooldown() - toSubstract;
-        Cooldown.setCooldown(i);
+        this.setCooldown(i);
     }
 
-    public static void addToCooldown(int toAdd){
+    public void addToCooldown(int toAdd){
         int i = getCooldown() + toAdd;
-        Cooldown.setCooldown(i);
+        this.setCooldown(i);
     }
 
-    public static void removeCooldown(Player player, Item item){
+    public void removeCooldown(Player player, Item item){
         player.getCooldowns().removeCooldown(item);
-        Cooldown.setCooldown(0);
+        this.setCooldown(0);
     }
 }

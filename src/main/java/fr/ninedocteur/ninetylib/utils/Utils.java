@@ -2,11 +2,9 @@ package fr.ninedocteur.ninetylib.utils;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import fr.ninedocteur.ninetylib.NinetyLib;
-import fr.ninedocteur.ninetylib.integrations.discord.IPCClient;
-import fr.ninedocteur.ninetylib.integrations.discord.IPCListener;
-import fr.ninedocteur.ninetylib.integrations.discord.entities.DiscordBuild;
-import fr.ninedocteur.ninetylib.integrations.discord.entities.RichPresence;
-import fr.ninedocteur.ninetylib.integrations.discord.exceptions.NoDiscordClientException;
+import fr.ninedocteur.ninetylib.integration.discord.rpc.DiscordEventHandlers;
+import fr.ninedocteur.ninetylib.integration.discord.rpc.DiscordRPC;
+import fr.ninedocteur.ninetylib.integration.discord.rpc.DiscordRichPresence;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -29,7 +27,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class Utils {
-    public class Game {
+    public static class Game {
         public static String getFPS(Minecraft mc) {
 
             return formatText(mc.fpsString.split("\\s+")[0]);
@@ -55,155 +53,75 @@ public class Utils {
         }
     }
 
-    public class Discord{
-        public static long APPID;
+    public static class Discord{
+        public static int APPID;
         public static String state;
         public static String detail;
         public static String largeImage;
         public static String largeImageText;
-        public static boolean button1enable;
-        public static boolean button2enable;
-        public static String button1Text;
-        public static String button2Text;
-        public static String button1url;
-        public static String button2url;
-        public Discord(long appId, String state, String detail, String largeImage, String largeImageText){
-            this.APPID = appId;
-            this.state = state;
-            this.detail = detail;
-            this.largeImage = largeImage;
-            this.largeImageText = largeImageText;
-            button1enable = false;
-            button2enable = false;
-        }
 
-        /**
-         *
-         * @param appId
-         * @param state
-         * @param detail
-         * @param largeImage
-         * @param largeImageText
-         * @param button1Text
-         * @param button1url
-         * With one button
-         */
-        public Discord(long appId, String state, String detail, String largeImage, String largeImageText, String button1Text, String button1url){
-            this.APPID = appId;
-            this.state = state;
-            this.detail = detail;
-            this.largeImage = largeImage;
-            this.largeImageText = largeImageText;
-            this.button1Text = button1Text;
-            this.button1url = button1url;
-            button1enable = true;
-            button2enable = false;
-        }
-
-        /**
-         *
-         * @param appId
-         * @param state
-         * @param detail
-         * @param largeImage
-         * @param largeImageText
-         * @param button1Text
-         * @param button1url
-         * @param button2Text
-         * @param button2url
-         * With two button
-         */
-
-        public Discord(long appId, String state, String detail, String largeImage, String largeImageText, String button1Text, String button1url, String button2Text, String button2url){
-            this.APPID = appId;
-            this.state = state;
-            this.detail = detail;
-            this.largeImage = largeImage;
-            this.largeImageText = largeImageText;
-            this.button1Text = button1Text;
-            this.button1url = button1url;
-            this.button2Text = button2Text;
-            this.button2url = button2url;
-            button1enable = true;
-            button2enable = true;
-        }
-
-        public static final RichPresence.Builder DEFAULT_BUILDER =  new RichPresence.Builder().setState(getState()).setDetails(getDetail()).setLargeImage(getLargeImage(), getLargeImageText());
-        public static final RichPresence.Builder ONEBTN_BUILDER =  new RichPresence.Builder().setState(getState()).setDetails(getDetail()).setLargeImage(getLargeImage(), getLargeImageText()).setButton1(getButton1Text(), getButton1url());
-        public static final RichPresence.Builder TWOBTN_BUILDER =  new RichPresence.Builder().setState(getState()).setDetails(getDetail()).setLargeImage(getLargeImage(), getLargeImageText()).setButton1(getButton1Text(), getButton1url()).setButton2(getButton2Text(), getButton2url());
-
-        public static IPCClient RPC;
-
-        public static void startRPC(long appID) {
-            RPC = new IPCClient(appID);
-            RPC.setListener(new IPCListener() {
-                @Override
-                public void onReady(IPCClient client) {
-                    if(!isButton1enable() && !isButton2enable()){
-                        client.sendRichPresence(DEFAULT_BUILDER.build());
-                    } else if(isButton1enable()){
-                        client.sendRichPresence(ONEBTN_BUILDER.build());
-                    } else if(isButton2enable()){
-                        client.sendRichPresence(TWOBTN_BUILDER.build());
-                    }
-                    NinetyLib.LOGGER.info("Ninety's Lib RPC Ready!");
-                    NinetyLib.LOGGER.warn("Ninety's Lib RPC Version 2.0");
+        public static void startRPC(String appId, String state, String detail, String largeImage, String largeImageText){
+            DiscordRPC lib = DiscordRPC.INSTANCE;
+            String applicationId = appId;
+            String steamId = "";
+            DiscordEventHandlers handlers = new DiscordEventHandlers();
+            handlers.ready = (user) ->{
+                NinetyLib.LOGGER.info("Ninety's Lib RPC Ready!");
+                NinetyLib.LOGGER.warn("Ninety's Lib RPC Version 1.0.1");
+            };
+            lib.Discord_Initialize(applicationId, handlers, true, steamId);
+            DiscordRichPresence presence = new DiscordRichPresence();
+            presence.startTimestamp = System.currentTimeMillis() / 1000;
+            presence.largeImageKey = largeImage;
+            presence.largeImageText = largeImageText;
+           // presence.smallImageKey = "zinc_icon";
+            //presence.smallImageText = "Player: " + Minecraft.getInstance().getUser().getName();
+            presence.details = detail;
+            presence.state = state;
+            lib.Discord_UpdatePresence(presence);
+            new Thread(() -> {
+                while (!Thread.currentThread().isInterrupted()) {
+                    lib.Discord_RunCallbacks();
+                    try {
+                        lib.Discord_UpdatePresence(presence);
+                        Thread.sleep(2000);
+                    } catch (InterruptedException ignored) {}
                 }
-            });
-            try {
-                NinetyLib.LOGGER.info("Starting Ninety's Lib RPC...");
-                RPC.connect(DiscordBuild.ANY);
-            } catch (NoDiscordClientException e) {
-                NinetyLib.LOGGER.error("Ninety's Lib RPC Failed:\n" + e.getMessage());
-            }
+            }, "Ninety's Lib-RPC").start();
         }
 
-        public long getAppID() {
-            return APPID;
-        }
-
-        public static String getState() {
-            return state;
-        }
-
-        public static String getDetail() {
-            return detail;
-        }
-
-        public static String getLargeImage() {
-            return largeImage;
-        }
-
-        public static String getLargeImageText() {
-            return largeImageText;
-        }
-
-        public static String getButton1Text() {
-            return button1Text;
-        }
-
-        public static String getButton1url() {
-            return button1url;
-        }
-
-        public static String getButton2Text() {
-            return button2Text;
-        }
-
-        public static String getButton2url() {
-            return button2url;
-        }
-
-        public static boolean isButton1enable() {
-            return button1enable;
-        }
-
-        public static boolean isButton2enable() {
-            return button2enable;
+        public static void startRPC(String appId, String state, String detail, String largeImage, String largeImageText, String smallImage, String smallImageText){
+            DiscordRPC lib = DiscordRPC.INSTANCE;
+            String applicationId = appId;
+            String steamId = "";
+            DiscordEventHandlers handlers = new DiscordEventHandlers();
+            handlers.ready = (user) ->{
+                NinetyLib.LOGGER.info("Ninety's Lib RPC Ready!");
+                NinetyLib.LOGGER.warn("Ninety's Lib RPC Version 1.0.1");
+            };
+            lib.Discord_Initialize(applicationId, handlers, true, steamId);
+            DiscordRichPresence presence = new DiscordRichPresence();
+            presence.startTimestamp = System.currentTimeMillis() / 1000;
+            presence.largeImageKey = largeImage;
+            presence.largeImageText = largeImageText;
+            presence.smallImageKey = smallImage;
+            presence.smallImageText = smallImageText;
+            presence.details = detail;
+            presence.state = state;
+            lib.Discord_UpdatePresence(presence);
+            new Thread(() -> {
+                while (!Thread.currentThread().isInterrupted()) {
+                    lib.Discord_RunCallbacks();
+                    try {
+                        lib.Discord_UpdatePresence(presence);
+                        Thread.sleep(2000);
+                    } catch (InterruptedException ignored) {}
+                }
+            }, "Ninety's Lib-RPC").start();
         }
     }
 
-    public class Web {
+    public static class Web {
         private static final Map<String, ResourceLocation> DOWNLOADED_TEXTURES = new HashMap<>();
         public static String readWebContent(String stringurl) {
             try {
@@ -255,7 +173,7 @@ public class Utils {
         }
     }
 
-    public class Player {
+    public static class Player {
         public static boolean isSneaking(net.minecraft.world.entity.player.Player player){
             return player.isCrouching();
         }

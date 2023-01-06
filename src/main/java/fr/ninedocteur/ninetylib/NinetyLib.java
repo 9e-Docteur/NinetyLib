@@ -1,7 +1,9 @@
 package fr.ninedocteur.ninetylib;
 
 import com.mojang.logging.LogUtils;
+import fr.ninedocteur.ninetylib.event.LibEvents;
 import fr.ninedocteur.ninetylib.utils.Utils;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -31,12 +33,12 @@ public class NinetyLib {
 
 
     public static final String MODID = "ninetylib";
+    public static final String MOD_VERSION = "1.0";
 
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public NinetyLib() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-
 
 
         MinecraftForge.EVENT_BUS.register(this);
